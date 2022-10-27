@@ -40,4 +40,6 @@ function generate_password() {
     document.getElementById("generated_password").classList.add('display-3')
     document.getElementById("copy-button").style.display = 'inline-block'
     document.getElementById("generated_password").innerHTML = escape_html(result)
+    document.getElementById("main-button").style.display = 'none'
+    document.getElementById("left-button").style.display = 'inline-block'
 }
