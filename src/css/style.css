@@ -1,0 +1,17 @@
+body {
+    margin-top: 250px;
+}
+
+#generated_password {
+    padding: 40px;
+    display: block;
+}
+.d-grid {
+    padding: 20px;
+}
+input {
+    padding: 5px;;
+}
+label {
+    padding: 10px;
+}
