@@ -34,12 +34,10 @@ function decode_html(html) {
   return txt.value;
 }
 
-$(document).ready(function () {
-    $("form").submit(function (event) {
-        var result = make_password(32)
-        document.getElementById("generated_password").classList.add('bg-info')
-        document.getElementById("generated_password").classList.add('display-3')
-        document.getElementById("copy-button").style.display = 'inline-block'
-        document.getElementById("generated_password").innerHTML = escape_html(result)
-    });
-});
+function generate_password() {
+    var result = make_password(32)
+    document.getElementById("generated_password").classList.add('bg-info')
+    document.getElementById("generated_password").classList.add('display-3')
+    document.getElementById("copy-button").style.display = 'inline-block'
+    document.getElementById("generated_password").innerHTML = escape_html(result)
+}
