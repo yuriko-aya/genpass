@@ -22,8 +22,8 @@ function make_password_v2(length) {
 }
 
 function copy_password() {
-    var copyText = document.getElementById("generated_password");
-    var cleaned_password = decode_html(copyText.innerHTML)
+    var copy_text = document.getElementById("generated_password");
+    var cleaned_password = decode_html(copy_text.innerHTML)
     navigator.clipboard.writeText(cleaned_password);
     alert("Password copied:\n" + cleaned_password);
 }
