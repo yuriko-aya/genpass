@@ -66,8 +66,6 @@ function generate_password_v2() {
         }
     }
     first_char = make_password(1)
-    console.log(result)
-    console.log(first_char)
     var full_result = first_char + result
     document.getElementById("generated_password").classList.add('bg-info')
     document.getElementById("generated_password").classList.add('display-3')
