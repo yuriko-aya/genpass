@@ -1,25 +1,22 @@
 function make_password(length) {
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var result           = '';
-    var charactersLength = characters.length;
+    var result = '';
+    var characters_length = characters.length;
     for (var i = 0; i < length; i++) {
         if ((i % 8 == 0) && (i != 0)) {
             result += '-'
         }
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        result += characters.charAt(Math.floor(Math.random() * characters_length));
     }
     return result;
 }
 
 function make_password_v2(length) {
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_-+={[}]|\:;<,>.?/';
-    var result           = '';
-    var charactersLength = characters.length;
+    var result = '';
+    var characters_length = characters.length;
     for (var i = 0; i < length; i++) {
-        if ((i % 8 == 0) && (i != 0)) {
-            result += '-'
-        }
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        result += characters.charAt(Math.floor(Math.random() * characters_length));
     }
     return result;
 }
