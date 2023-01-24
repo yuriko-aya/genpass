@@ -67,7 +67,7 @@ function generate_password_v2() {
     document.getElementById("generated_password").classList.add('bg-info')
     document.getElementById("generated_password").classList.add('display-3')
     document.getElementById("copy-button").style.display = 'inline-block'
-    document.getElementById("generated_password").innerHTML = escape_html(full_result)
+    document.getElementById("generated_password").innerHTML = escape_html(result)
     document.getElementById("main-button").style.display = 'none'
     document.getElementById("left-button").style.display = 'inline-block'
 }
