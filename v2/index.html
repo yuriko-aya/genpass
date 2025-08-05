@@ -60,17 +60,23 @@
     </div>
     
     <script>
-      function generate_password_v2_enhanced() {
+      window.generate_password_v2_enhanced = function() {
         try {
           const regex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
           let result;
           let attempts = 0;
           const maxAttempts = 1000;
           
-          do {
-            result = make_password_v2(16);
-            attempts++;
-          } while (!regex.test(result) && attempts < maxAttempts);
+          // Use make_password_v2 if available, otherwise fallback
+          if (typeof make_password_v2 === 'function') {
+            do {
+              result = make_password_v2(16);
+              attempts++;
+            } while (!regex.test(result) && attempts < maxAttempts);
+          } else {
+            // Fallback if make_password_v2 is not available
+            result = generateFallbackPasswordV2(16);
+          }
           
           if (attempts >= maxAttempts) {
             throw new Error('Failed to generate valid password after maximum attempts');
@@ -88,11 +94,26 @@
           document.getElementById("left-button").style.display = 'inline-block';
         } catch (error) {
           console.error('Error generating password v2:', error);
-          showCopyFeedback('Error generating password. Please try again.');
+          if (typeof showCopyFeedback === 'function') {
+            showCopyFeedback('Error generating password. Please try again.');
+          } else {
+            alert('Error generating password. Please try again.');
+          }
         }
       }
       
-      function calculatePasswordStrength(password) {
+      window.generateFallbackPasswordV2 = function(length) {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+        let result = '';
+        
+        for (let i = 0; i < length; i++) {
+          result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        
+        return result;
+      }
+      
+      window.calculatePasswordStrength = function(password) {
         let score = 0;
         let feedback = '';
         
@@ -119,7 +140,7 @@
         return { score: Math.min(score, 100), feedback };
       }
       
-      function showPasswordStrength(password) {
+      window.showPasswordStrength = function(password) {
         const strength = calculatePasswordStrength(password);
         const strengthElement = document.getElementById('password-strength');
         const barElement = document.getElementById('strength-bar');

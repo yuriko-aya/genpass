@@ -6,19 +6,22 @@ A client-side password generator web application that creates secure passwords u
 
 ## Features
 
-- **Two Password Generation Algorithms**
-  - **Version 1**: 32-character alphanumeric passwords with hyphens for readability
+- **Enhanced Password Generation Algorithms**
+  - **Version 1**: Customizable length (8-64 chars) with selectable character types and optional hyphens
   - **Version 2**: 16-character passwords with special characters and strength validation
 - **Multiple Interfaces**: Interactive UI and API-style endpoints
-- **Copy to Clipboard**: One-click password copying with confirmation
+- **Advanced Customization**: Choose character types, length, and formatting options
+- **Password Strength Analysis**: Real-time strength scoring and visual feedback
+- **Modern Copy Experience**: Toast notifications instead of intrusive alerts
 - **Responsive Design**: Bootstrap-powered mobile-friendly interface
+- **Cryptographically Secure**: Uses `crypto.getRandomValues()` when available
 - **Client-Side Only**: No server communication, passwords never leave your browser
 
 ## Available Interfaces
 
 ### Interactive UI
-- **Main Interface**: [https://yuriko-aya.github.io/genpass](https://yuriko-aya.github.io/genpass) - Version 1 algorithm
-- **Version 2 Interface**: [https://yuriko-aya.github.io/genpass/v2](https://yuriko-aya.github.io/genpass/v2) - Version 2 algorithm
+- **Main Interface**: [https://yuriko-aya.github.io/genpass](https://yuriko-aya.github.io/genpass) - Enhanced customizable password generator
+- **Version 2 Interface**: [https://yuriko-aya.github.io/genpass/v2](https://yuriko-aya.github.io/genpass/v2) - Advanced algorithm with strength validation
 
 ### API-Style Endpoints
 - **API v1**: [https://yuriko-aya.github.io/genpass/api](https://yuriko-aya.github.io/genpass/api) - Simple password output (v1)
@@ -26,11 +29,12 @@ A client-side password generator web application that creates secure passwords u
 
 ## Password Algorithms
 
-### Version 1 (`make_password`)
-- **Length**: 32 characters
-- **Character Set**: A-Z, a-z, 0-9 (62 characters)
-- **Format**: `XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX`
-- **Use Case**: General purpose, readable passwords
+### Version 1 (`make_password` + Custom Generator)
+- **Length**: Customizable 8-64 characters
+- **Character Set**: Selectable (A-Z, a-z, 0-9, special characters)
+- **Format**: Optional hyphens every 8 characters
+- **Features**: Real-time strength analysis, custom character type selection
+- **Use Case**: Flexible passwords for various security requirements
 
 ### Version 2 (`make_password_v2`)
 - **Length**: 16 characters
@@ -61,19 +65,24 @@ genpass/
 
 ## Security Features
 
+- **Cryptographically Secure Generation**: Uses `crypto.getRandomValues()` when available, with Math.random() fallback
 - **Client-Side Generation**: Passwords are generated entirely in your browser
 - **No Data Transmission**: Passwords never leave your device
 - **HTML Escaping**: Protection against XSS attacks
-- **Random Generation**: Uses `Math.random()` for password generation
+- **Error Handling**: Robust error handling with user feedback
 - **No Storage**: Passwords are not stored anywhere
+- **Strength Validation**: Real-time password strength analysis and scoring
 
 ## Usage
 
 ### Interactive Interface
 1. Visit one of the interactive interfaces
-2. Click "Generate Password"
-3. Copy the generated password using the "Copy Password" button
-4. Generate new passwords as needed
+2. **Main Interface**: Customize password length (8-64 characters) and select character types
+3. **Version 2**: Generate cryptographically strong 16-character passwords
+4. Click "Generate Password" to create a new password
+5. View the password strength indicator
+6. Copy the password using the "Copy Password" button (shows toast notification)
+7. Generate additional passwords as needed
 
 ### API-Style Usage
 Simply visit the API endpoints to get a password directly displayed on the page. Useful for:
