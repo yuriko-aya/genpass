@@ -2,12 +2,50 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="../src/js/genpass.js"></script>
-    <title>Password Generator v2.0</title>
+    <title>Password Generator API v1</title>
+    <style>
+      body {
+        font-family: 'Courier New', monospace;
+        padding: 20px;
+        background: #f8f9fa;
+        margin: 0;
+      }
+      .password {
+        font-size: 18px;
+        font-weight: bold;
+        background: white;
+        padding: 15px;
+        border-radius: 5px;
+        border: 2px solid #007bff;
+        word-break: break-all;
+      }
+      .info {
+        margin-top: 20px;
+        color: #666;
+        font-size: 14px;
+      }
+    </style>
   </head>
   <body>
-        <script>
-            document.write(make_password(32));
-        </script>
+    <div class="password" id="password-output">Generating password...</div>
+    <div class="info">
+      <p>Password Generator API v1</p>
+      <p>Algorithm: 32-character alphanumeric with hyphens</p>
+      <p>Refresh page for new password</p>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        try {
+          const password = make_password(32);
+          document.getElementById('password-output').textContent = password;
+        } catch (error) {
+          document.getElementById('password-output').textContent = 'Error generating password';
+          console.error('Password generation error:', error);
+        }
+      });
+    </script>
   </body>
 </html>

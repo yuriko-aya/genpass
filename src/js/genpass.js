@@ -1,44 +1,119 @@
+// Cryptographically secure random number generator
+function getSecureRandom(max) {
+    if (window.crypto && window.crypto.getRandomValues) {
+        const array = new Uint32Array(1);
+        window.crypto.getRandomValues(array);
+        return array[0] % max;
+    } else {
+        // Fallback to Math.random for older browsers
+        console.warn('Using Math.random() fallback. Not cryptographically secure.');
+        return Math.floor(Math.random() * max);
+    }
+}
+
 function make_password(length) {
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var result = '';
     var characters_length = characters.length;
     for (var i = 0; i < length; i++) {
-        if ((i % 8 == 0) && (i != 0)) {
-            result += '-'
+        if ((i % 8 === 0) && (i !== 0)) {
+            result += '-';
         }
-        result += characters.charAt(Math.floor(Math.random() * characters_length));
+        result += characters.charAt(getSecureRandom(characters_length));
     }
     return result;
 }
 
 function make_password_v2(length) {
-    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_-+={[}]|\:;<,>.?/';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#$%^&*()_-+={[}]|\\:;<,>.?/';
     var result = '';
     var characters_length = characters.length;
-    first_char = make_password(1)
+    var first_char = make_password(1);
     for (var i = 0; i < length - 1; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters_length));
+        result += characters.charAt(getSecureRandom(characters_length));
     }
-    var full_result = first_char + result
+    var full_result = first_char + result;
     return full_result;
 }
 
 function copy_password() {
     var copy_text = document.getElementById("generated_password");
-    var cleaned_password = decode_html(copy_text.innerHTML)
-    navigator.clipboard.writeText(cleaned_password);
-    alert("Password copied:\n" + cleaned_password);
+    var cleaned_password = decode_html(copy_text.innerHTML);
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cleaned_password).then(function() {
+            showCopyFeedback("Password copied successfully!");
+        }).catch(function(err) {
+            console.error('Failed to copy password: ', err);
+            fallbackCopyToClipboard(cleaned_password);
+        });
+    } else {
+        fallbackCopyToClipboard(cleaned_password);
+    }
 }
 
-function escape_html(unsafe)
-{
+function fallbackCopyToClipboard(text) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    textArea.style.top = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        var successful = document.execCommand('copy');
+        if (successful) {
+            showCopyFeedback("Password copied successfully!");
+        } else {
+            showCopyFeedback("Failed to copy password. Please copy manually.");
+        }
+    } catch (err) {
+        console.error('Fallback copy failed: ', err);
+        showCopyFeedback("Failed to copy password. Please copy manually.");
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+function showCopyFeedback(message) {
+    // Create a toast notification instead of alert
+    var toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        z-index: 1000;
+        transition: opacity 0.3s ease;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        setTimeout(function() {
+            if (document.body.contains(toast)) {
+                document.body.removeChild(toast);
+            }
+        }, 300);
+    }, 2000);
+}
+
+function escape_html(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
- }
+}
 
 function decode_html(html) {
   var txt = document.createElement("textarea");
@@ -47,27 +122,47 @@ function decode_html(html) {
 }
 
 function generate_password() {
-    var result = make_password(32)
-    document.getElementById("generated_password").classList.add('bg-info')
-    document.getElementById("generated_password").classList.add('display-3')
-    document.getElementById("copy-button").style.display = 'inline-block'
-    document.getElementById("generated_password").innerHTML = escape_html(result)
-    document.getElementById("main-button").style.display = 'none'
-    document.getElementById("left-button").style.display = 'inline-block'
+    try {
+        var result = make_password(32);
+        var passwordElement = document.getElementById("generated_password");
+        
+        passwordElement.classList.add('bg-info', 'display-3');
+        passwordElement.innerHTML = escape_html(result);
+        
+        document.getElementById("copy-button").style.display = 'inline-block';
+        document.getElementById("main-button").style.display = 'none';
+        document.getElementById("left-button").style.display = 'inline-block';
+    } catch (error) {
+        console.error('Error generating password:', error);
+        showCopyFeedback('Error generating password. Please try again.');
+    }
 }
 
 function generate_password_v2() {
-    var regex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;;
-    while (true) {
-        var result = make_password_v2(16);
-        if (regex.test(result)) {
-            break;
+    try {
+        var regex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        var result;
+        var attempts = 0;
+        var maxAttempts = 1000; // Prevent infinite loops
+        
+        do {
+            result = make_password_v2(16);
+            attempts++;
+        } while (!regex.test(result) && attempts < maxAttempts);
+        
+        if (attempts >= maxAttempts) {
+            throw new Error('Failed to generate valid password after maximum attempts');
         }
+        
+        var passwordElement = document.getElementById("generated_password");
+        passwordElement.classList.add('bg-info', 'display-3');
+        passwordElement.innerHTML = escape_html(result);
+        
+        document.getElementById("copy-button").style.display = 'inline-block';
+        document.getElementById("main-button").style.display = 'none';
+        document.getElementById("left-button").style.display = 'inline-block';
+    } catch (error) {
+        console.error('Error generating password v2:', error);
+        showCopyFeedback('Error generating password. Please try again.');
     }
-    document.getElementById("generated_password").classList.add('bg-info')
-    document.getElementById("generated_password").classList.add('display-3')
-    document.getElementById("copy-button").style.display = 'inline-block'
-    document.getElementById("generated_password").innerHTML = escape_html(result)
-    document.getElementById("main-button").style.display = 'none'
-    document.getElementById("left-button").style.display = 'inline-block'
 }
