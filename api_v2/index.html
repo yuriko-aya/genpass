@@ -2,46 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../src/js/genpass.js"></script>
     <title>Password Generator API v2</title>
-    <style>
-      body {
-        font-family: 'Courier New', monospace;
-        padding: 20px;
-        background: #f8f9fa;
-        margin: 0;
-      }
-      .password {
-        font-size: 18px;
-        font-weight: bold;
-        background: white;
-        padding: 15px;
-        border-radius: 5px;
-        border: 2px solid #28a745;
-        word-break: break-all;
-      }
-      .info {
-        margin-top: 20px;
-        color: #666;
-        font-size: 14px;
-      }
-      .loading {
-        color: #007bff;
-      }
-    </style>
   </head>
   <body>
-    <div class="password" id="password-output">
-      <span class="loading">Generating secure password...</span>
-    </div>
-    <div class="info">
-      <p>Password Generator API v2</p>
-      <p>Algorithm: 16-character with special characters and strength validation</p>
-      <p>Refresh page for new password</p>
-    </div>
-    
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         try {
@@ -50,19 +14,32 @@
           let attempts = 0;
           const maxAttempts = 1000;
           
-          do {
-            result = make_password_v2(16);
-            attempts++;
-          } while (!regex.test(result) && attempts < maxAttempts);
-          
-          if (attempts >= maxAttempts) {
-            throw new Error('Failed to generate valid password');
+          // Use make_password_v2 if available, otherwise create fallback
+          if (typeof make_password_v2 === 'function') {
+            do {
+              result = make_password_v2(16);
+              attempts++;
+            } while (!regex.test(result) && attempts < maxAttempts);
+          } else {
+            // Fallback password generation
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+            do {
+              result = '';
+              for (let i = 0; i < 16; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+              }
+              attempts++;
+            } while (!regex.test(result) && attempts < maxAttempts);
           }
           
-          document.getElementById('password-output').textContent = result;
+          if (attempts >= maxAttempts) {
+            document.body.textContent = 'ERROR_GENERATION_FAILED';
+          } else {
+            // Output only the password as plain text
+            document.body.textContent = result;
+          }
         } catch (error) {
-          document.getElementById('password-output').innerHTML = 
-            '<span style="color: red;">Error generating password</span>';
+          document.body.textContent = 'ERROR_GENERATION_FAILED';
           console.error('Password generation error:', error);
         }
       });
