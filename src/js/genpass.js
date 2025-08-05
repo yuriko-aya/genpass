@@ -36,19 +36,26 @@ function make_password_v2(length) {
     return full_result;
 }
 
+// Global variable to store the current password for copying
+var currentPassword = '';
+
 function copy_password() {
-    var copy_text = document.getElementById("generated_password");
-    var cleaned_password = decode_html(copy_text.innerHTML);
+    var passwordToCopy = currentPassword || '';
+    
+    if (!passwordToCopy) {
+        showCopyFeedback("No password to copy. Please generate a password first.");
+        return;
+    }
     
     if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(cleaned_password).then(function() {
+        navigator.clipboard.writeText(passwordToCopy).then(function() {
             showCopyFeedback("Password copied successfully!");
         }).catch(function(err) {
             console.error('Failed to copy password: ', err);
-            fallbackCopyToClipboard(cleaned_password);
+            fallbackCopyToClipboard(passwordToCopy);
         });
     } else {
-        fallbackCopyToClipboard(cleaned_password);
+        fallbackCopyToClipboard(passwordToCopy);
     }
 }
 
@@ -124,6 +131,7 @@ function decode_html(html) {
 function generate_password() {
     try {
         var result = make_password(32);
+        currentPassword = result; // Store the raw password for copying
         var passwordElement = document.getElementById("generated_password");
         
         passwordElement.classList.add('bg-info', 'display-3');
@@ -154,6 +162,7 @@ function generate_password_v2() {
             throw new Error('Failed to generate valid password after maximum attempts');
         }
         
+        currentPassword = result; // Store the raw password for copying
         var passwordElement = document.getElementById("generated_password");
         passwordElement.classList.add('bg-info', 'display-3');
         passwordElement.innerHTML = escape_html(result);

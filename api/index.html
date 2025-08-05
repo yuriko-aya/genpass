@@ -2,47 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="../src/js/genpass.js"></script>
     <title>Password Generator API v1</title>
-    <style>
-      body {
-        font-family: 'Courier New', monospace;
-        padding: 20px;
-        background: #f8f9fa;
-        margin: 0;
-      }
-      .password {
-        font-size: 18px;
-        font-weight: bold;
-        background: white;
-        padding: 15px;
-        border-radius: 5px;
-        border: 2px solid #007bff;
-        word-break: break-all;
-      }
-      .info {
-        margin-top: 20px;
-        color: #666;
-        font-size: 14px;
-      }
-    </style>
   </head>
   <body>
-    <div class="password" id="password-output">Generating password...</div>
-    <div class="info">
-      <p>Password Generator API v1</p>
-      <p>Algorithm: 32-character alphanumeric with hyphens</p>
-      <p>Refresh page for new password</p>
-    </div>
-    
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         try {
-          const password = make_password(32);
-          document.getElementById('password-output').textContent = password;
+          let result;
+          
+          // Use make_password if available, otherwise create fallback
+          if (typeof make_password === 'function') {
+            result = make_password(32);
+          } else {
+            // Fallback password generation
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            result = '';
+            for (let i = 0; i < 32; i++) {
+              if ((i % 8 === 0) && (i !== 0)) {
+                result += '-';
+              }
+              result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+          }
+          
+          // Output only the password as plain text
+          document.body.textContent = result;
         } catch (error) {
-          document.getElementById('password-output').textContent = 'Error generating password';
+          document.body.textContent = 'ERROR_GENERATION_FAILED';
           console.error('Password generation error:', error);
         }
       });

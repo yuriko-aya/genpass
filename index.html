@@ -127,6 +127,13 @@
             hyphens: addHyphens
           });
           
+          // Store the raw password for copying
+          if (typeof window.currentPassword !== 'undefined') {
+            window.currentPassword = result;
+          } else {
+            window.generatedPassword = result; // Fallback storage
+          }
+          
           const passwordElement = document.getElementById("generated_password");
           passwordElement.classList.add('bg-light', 'p-3', 'rounded', 'border');
           passwordElement.innerHTML = '<code style="font-size: 1.2em; word-break: break-all;">' + escape_html(result) + '</code>';
@@ -147,16 +154,97 @@
         }
       }
       
+      // Override copy_password if it exists, or create it if it doesn't
+      window.copy_password = function() {
+        var passwordToCopy = '';
+        
+        // Try to get password from different sources
+        if (typeof window.currentPassword !== 'undefined' && window.currentPassword) {
+          passwordToCopy = window.currentPassword;
+        } else if (typeof window.generatedPassword !== 'undefined' && window.generatedPassword) {
+          passwordToCopy = window.generatedPassword;
+        } else {
+          // Fallback: try to extract from the display element
+          var passwordElement = document.getElementById("generated_password");
+          if (passwordElement && passwordElement.textContent) {
+            passwordToCopy = passwordElement.textContent.trim();
+          }
+        }
+        
+        if (!passwordToCopy) {
+          alert("No password to copy. Please generate a password first.");
+          return;
+        }
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(passwordToCopy).then(function() {
+            if (typeof showCopyFeedback === 'function') {
+              showCopyFeedback("Password copied successfully!");
+            } else {
+              alert("Password copied successfully!");
+            }
+          }).catch(function(err) {
+            console.error('Failed to copy password: ', err);
+            fallbackCopyToClipboard(passwordToCopy);
+          });
+        } else {
+          fallbackCopyToClipboard(passwordToCopy);
+        }
+      }
+      
+      function fallbackCopyToClipboard(text) {
+        var textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          var successful = document.execCommand('copy');
+          var message = successful ? "Password copied successfully!" : "Failed to copy password. Please copy manually.";
+          if (typeof showCopyFeedback === 'function') {
+            showCopyFeedback(message);
+          } else {
+            alert(message);
+          }
+        } catch (err) {
+          console.error('Fallback copy failed: ', err);
+          if (typeof showCopyFeedback === 'function') {
+            showCopyFeedback("Failed to copy password. Please copy manually.");
+          } else {
+            alert("Failed to copy password. Please copy manually.");
+          }
+        }
+        
+        document.body.removeChild(textArea);
+      }
+      
       window.generateCustomPassword = function(length, options) {
         let characters = '';
+        let alphanumericChars = '';
         
-        if (options.uppercase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (options.lowercase) characters += 'abcdefghijklmnopqrstuvwxyz';
-        if (options.numbers) characters += '0123456789';
-        if (options.symbols) characters += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        if (options.uppercase) {
+          characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          alphanumericChars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        }
+        if (options.lowercase) {
+          characters += 'abcdefghijklmnopqrstuvwxyz';
+          alphanumericChars += 'abcdefghijklmnopqrstuvwxyz';
+        }
+        if (options.numbers) {
+          characters += '0123456789';
+          alphanumericChars += '0123456789';
+        }
+        if (options.symbols) {
+          characters += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+        }
         
         let result = '';
         const charactersLength = characters.length;
+        const alphanumericLength = alphanumericChars.length;
         
         // Use the secure random function if available
         const getRandomFunc = typeof getSecureRandom === 'function' ? getSecureRandom : function(max) {
@@ -167,7 +255,13 @@
           if (options.hyphens && (i % 8 === 0) && (i !== 0)) {
             result += '-';
           }
-          result += characters.charAt(getRandomFunc(charactersLength));
+          
+          // First character must be alphanumeric if symbols are included
+          if (i === 0 && options.symbols && alphanumericLength > 0) {
+            result += alphanumericChars.charAt(getRandomFunc(alphanumericLength));
+          } else {
+            result += characters.charAt(getRandomFunc(charactersLength));
+          }
         }
         
         return result;
