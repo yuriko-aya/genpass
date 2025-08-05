@@ -94,12 +94,13 @@
     </div>
     
     <script>
-      function updateLengthDisplay() {
+      // Ensure functions are available globally
+      window.updateLengthDisplay = function() {
         const length = document.getElementById('password-length').value;
         document.getElementById('length-display').textContent = length;
       }
       
-      function generate_custom_password() {
+      window.generate_custom_password = function() {
         const length = parseInt(document.getElementById('password-length').value);
         const includeUppercase = document.getElementById('include-uppercase').checked;
         const includeLowercase = document.getElementById('include-lowercase').checked;
@@ -109,7 +110,11 @@
         
         // Validate at least one character type is selected
         if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSymbols) {
-          showCopyFeedback('Please select at least one character type.');
+          if (typeof showCopyFeedback === 'function') {
+            showCopyFeedback('Please select at least one character type.');
+          } else {
+            alert('Please select at least one character type.');
+          }
           return;
         }
         
@@ -134,11 +139,15 @@
           document.getElementById("left-button").style.display = 'inline-block';
         } catch (error) {
           console.error('Error generating custom password:', error);
-          showCopyFeedback('Error generating password. Please try again.');
+          if (typeof showCopyFeedback === 'function') {
+            showCopyFeedback('Error generating password. Please try again.');
+          } else {
+            alert('Error generating password. Please try again.');
+          }
         }
       }
       
-      function generateCustomPassword(length, options) {
+      window.generateCustomPassword = function(length, options) {
         let characters = '';
         
         if (options.uppercase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -149,17 +158,22 @@
         let result = '';
         const charactersLength = characters.length;
         
+        // Use the secure random function if available
+        const getRandomFunc = typeof getSecureRandom === 'function' ? getSecureRandom : function(max) {
+          return Math.floor(Math.random() * max);
+        };
+        
         for (let i = 0; i < length; i++) {
           if (options.hyphens && (i % 8 === 0) && (i !== 0)) {
             result += '-';
           }
-          result += characters.charAt(getSecureRandom(charactersLength));
+          result += characters.charAt(getRandomFunc(charactersLength));
         }
         
         return result;
       }
       
-      function calculatePasswordStrength(password) {
+      window.calculatePasswordStrength = function(password) {
         let score = 0;
         let feedback = '';
         
@@ -186,7 +200,7 @@
         return { score: Math.min(score, 100), feedback };
       }
       
-      function showPasswordStrength(password) {
+      window.showPasswordStrength = function(password) {
         const strength = calculatePasswordStrength(password);
         const strengthElement = document.getElementById('password-strength');
         const barElement = document.getElementById('strength-bar');
