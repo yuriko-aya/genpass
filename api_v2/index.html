@@ -2,47 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <script src="../src/js/genpass.js"></script>
-    <title>Password Generator API v2</title>
+    <meta http-equiv="refresh" content="0; url=https://genpass.yuriko-aya.cc/api_v2/">
+    <link rel="canonical" href="https://genpass.yuriko-aya.cc/api_v2/">
+    <title>Redirecting to GenPass API v2...</title>
+    <script>window.location.replace("https://genpass.yuriko-aya.cc/api_v2/");</script>
   </head>
   <body>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        try {
-          const regex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-          let result;
-          let attempts = 0;
-          const maxAttempts = 1000;
-          
-          // Use make_password_v2 if available, otherwise create fallback
-          if (typeof make_password_v2 === 'function') {
-            do {
-              result = make_password_v2(16);
-              attempts++;
-            } while (!regex.test(result) && attempts < maxAttempts);
-          } else {
-            // Fallback password generation
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
-            do {
-              result = '';
-              for (let i = 0; i < 16; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-              }
-              attempts++;
-            } while (!regex.test(result) && attempts < maxAttempts);
-          }
-          
-          if (attempts >= maxAttempts) {
-            document.body.textContent = 'ERROR_GENERATION_FAILED';
-          } else {
-            // Output only the password as plain text
-            document.body.textContent = result;
-          }
-        } catch (error) {
-          document.body.textContent = 'ERROR_GENERATION_FAILED';
-          console.error('Password generation error:', error);
-        }
-      });
-    </script>
+    <div style="text-align:center;margin-top:50px;font-family:sans-serif;">
+      <h1>Redirecting to GenPass API v2...</h1>
+      <p>If you are not redirected automatically, <a href="https://genpass.yuriko-aya.cc/api_v2/">click here</a>.</p>
+    </div>
   </body>
 </html>
