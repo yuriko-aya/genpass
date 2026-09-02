@@ -34,7 +34,29 @@ def _secure_shuffle(items):
     return items
 
 
-def _generate_with_coverage(length, pools, char_set):
+def _is_symbol(char, symbol_chars):
+    """Return True if char is in the symbol set."""
+    return char in symbol_chars
+
+
+def _ensure_non_symbol_first(chars, char_set, symbol_chars):
+    """Ensure the first character is not a symbol by swapping or replacing it."""
+    if not symbol_chars or not _is_symbol(chars[0], symbol_chars):
+        return chars
+
+    for i in range(1, len(chars)):
+        if not _is_symbol(chars[i], symbol_chars):
+            chars[0], chars[i] = chars[i], chars[0]
+            return chars
+
+    non_symbol_charset = ''.join(c for c in char_set if c not in symbol_chars)
+    if non_symbol_charset:
+        chars[0] = _secure_choice(non_symbol_charset)
+
+    return chars
+
+
+def _generate_with_coverage(length, pools, char_set, symbol_chars=''):
     """
     Build a password guaranteed to include at least one character
     from each pool, then fill and shuffle the remaining positions.
@@ -48,7 +70,10 @@ def _generate_with_coverage(length, pools, char_set):
     for _ in range(length - len(pools)):
         chars.append(_secure_choice(char_set))
 
-    return _secure_shuffle(chars)
+    chars = _secure_shuffle(chars)
+    if symbol_chars:
+        chars = _ensure_non_symbol_first(chars, char_set, symbol_chars)
+    return chars
 
 
 def _insert_hyphens(chars):
@@ -111,7 +136,7 @@ def make_password_v2(length):
         string.digits,
         V2_REQUIRED_SYMBOL_CHARS,
     ]
-    return ''.join(_generate_with_coverage(length, pools, characters))
+    return ''.join(_generate_with_coverage(length, pools, characters, V2_SPECIAL_CHARS))
 
 
 def generate_custom_password(
@@ -164,7 +189,8 @@ def generate_custom_password(
         char_set += CUSTOM_SYMBOL_CHARS
         pools.append(CUSTOM_SYMBOL_CHARS)
 
-    chars = _generate_with_coverage(length, pools, char_set)
+    symbol_chars = CUSTOM_SYMBOL_CHARS if include_symbols else ''
+    chars = _generate_with_coverage(length, pools, char_set, symbol_chars)
     password = ''.join(chars)
     if add_hyphens:
         password = _insert_hyphens(chars)

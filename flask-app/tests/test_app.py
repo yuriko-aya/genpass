@@ -53,3 +53,11 @@ def test_security_headers_present(client):
     assert response.headers['X-Content-Type-Options'] == 'nosniff'
     assert response.headers['X-Frame-Options'] == 'DENY'
     assert 'Content-Security-Policy' in response.headers
+
+
+def test_templates_do_not_use_inline_event_handlers(client):
+    for path in ('/', '/v2/'):
+        response = client.get(path)
+        html = response.get_data(as_text=True)
+        assert 'onclick=' not in html
+        assert 'oninput=' not in html

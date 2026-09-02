@@ -17,3 +17,9 @@ async function generatePasswordV2() {
     GenPass.showCopyFeedback('Error generating password. Please try again.', true);
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('main-button').addEventListener('click', generatePasswordV2);
+  document.getElementById('left-button').addEventListener('click', generatePasswordV2);
+  document.getElementById('copy-button').addEventListener('click', GenPass.copyPassword);
+});

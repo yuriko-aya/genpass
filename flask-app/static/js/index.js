@@ -47,3 +47,10 @@ async function generateCustomPassword() {
     GenPass.showCopyFeedback('Error generating password. Please try again.', true);
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('password-length').addEventListener('input', updateLengthDisplay);
+  document.getElementById('main-button').addEventListener('click', generateCustomPassword);
+  document.getElementById('left-button').addEventListener('click', generateCustomPassword);
+  document.getElementById('copy-button').addEventListener('click', GenPass.copyPassword);
+});

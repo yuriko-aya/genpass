@@ -27,7 +27,7 @@
           <div class="card-body text-start">
             <div class="mb-3">
               <label for="password-length" class="form-label">Password Length: <span id="length-display">32</span></label>
-              <input type="range" class="form-range" min="8" max="64" value="32" id="password-length" oninput="updateLengthDisplay()">
+              <input type="range" class="form-range" min="8" max="64" value="32" id="password-length">
             </div>
 
             <div class="mb-3">
@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <button type="button" id="main-button" class="btn btn-primary btn-lg" onclick="generateCustomPassword()">Generate Password</button>
+        <button type="button" id="main-button" class="btn btn-primary btn-lg">Generate Password</button>
 
         <div id="generated_password" class="mt-4"></div>
 
@@ -71,10 +71,10 @@
         <div class="d-grid mt-3">
           <div class="row">
             <div class="col-sm">
-              <button id="left-button" type="button" class="btn btn-primary btn-lg left-button" style="display: none;" onclick="generateCustomPassword()">Generate Another</button>
+              <button id="left-button" type="button" class="btn btn-primary btn-lg left-button" style="display: none;">Generate Another</button>
             </div>
             <div class="col-sm">
-              <button id="copy-button" type="button" class="btn btn-success btn-lg" style="display: none;" onclick="GenPass.copyPassword()">
+              <button id="copy-button" type="button" class="btn btn-success btn-lg" style="display: none;">
                 📋 Copy Password
               </button>
             </div>

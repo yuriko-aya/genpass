@@ -4,6 +4,7 @@ import pytest
 
 from password_generator import (
     CUSTOM_SYMBOL_CHARS,
+    V2_SPECIAL_CHARS,
     generate_custom_password,
     make_password,
     make_password_v2,
@@ -82,3 +83,13 @@ def test_validate_password_strength_strong_password():
     result = validate_password_strength('Abcdef1!ghijklmnop')
     assert result['score'] >= 80
     assert result['strength'] == 'strong'
+
+
+def test_first_character_is_never_symbol():
+    for _ in range(100):
+        password = make_password_v2(16)
+        assert password[0] not in V2_SPECIAL_CHARS
+
+        password = generate_custom_password(length=16, include_symbols=True)
+        assert password[0] not in CUSTOM_SYMBOL_CHARS
+        assert password[0] != '-'
