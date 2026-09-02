@@ -1,29 +1,42 @@
 # GenPass - Project Structure
 
-This project now contains two versions:
+## Root (GitHub Pages redirects)
 
-## 📂 Original JavaScript Version (Current Directory)
+Static redirect pages only. Each file sends visitors to [genpass.yuriko-aya.cc](https://genpass.yuriko-aya.cc):
 
-The original client-side JavaScript password generator:
-- **index.html** - Main UI
-- **v2/index.html** - Advanced UI
-- **api/index.html** - API v1
-- **api_v2/index.html** - API v2
-- **src/js/genpass.js** - JavaScript logic
-- **src/css/style.css** - Styling
+- `index.html` → `/`
+- `v2/index.html` → `/v2/`
+- `api/index.html` → `/api/`
+- `api_v2/index.html` → `/api_v2/`
 
-This version runs entirely in the browser with no server required.
+No application logic lives here.
 
-## 🐍 Flask/Gunicorn Version (flask-app/ directory)
+## flask-app/ (application)
 
-A production-ready Flask backend conversion:
-- Server-side password generation with Python
-- REST API endpoints
-- Gunicorn production server
-- Docker containerization
-- Comprehensive documentation
+The Flask/Gunicorn application that powers the live site.
 
-### Quick Start (Flask Version)
+```
+flask-app/
+├── app.py                  # Routes and API handlers
+├── password_generator.py   # Password generation logic
+├── gunicorn_config.py      # Gunicorn production config
+├── requirements.txt        # Python dependencies
+├── run_dev.sh              # Flask dev server (port 5000)
+├── run_prod.sh             # Gunicorn (port 8000)
+├── Dockerfile
+├── docker-compose.yml
+├── templates/
+│   ├── index.html          # Main UI
+│   └── v2/index.html       # Version 2 UI
+├── static/
+│   ├── css/style.css
+│   └── js/                 # Shared + page-specific scripts
+└── tests/
+    ├── test_password_generator.py
+    └── test_app.py
+```
+
+### Quick Start
 
 ```bash
 cd flask-app
@@ -31,36 +44,6 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ./run_dev.sh
-# Visit http://localhost:5000
 ```
 
-See **[flask-app/START_HERE.md](flask-app/START_HERE.md)** for complete setup instructions.
-
-## 🔄 Choose Your Version
-
-### Use Original (JavaScript) if:
-- You want a simple static website
-- No server setup needed
-- Client-side only
-- Easy deployment to GitHub Pages
-
-### Use Flask Version if:
-- You need a production backend
-- Want REST API endpoints
-- Need server-side validation
-- Want to deploy with Docker
-- Need centralized password generation
-
-## 📚 Documentation
-
-### Original Project:
-- [README.md](README.md) - Feature overview
-
-### Flask Version:
-- [flask-app/START_HERE.md](flask-app/START_HERE.md) - Quick start
-- [flask-app/QUICKSTART.md](flask-app/QUICKSTART.md) - 5-minute setup
-- [flask-app/FLASK_SETUP.md](flask-app/FLASK_SETUP.md) - Complete guide
-- [flask-app/MIGRATION.md](flask-app/MIGRATION.md) - Technical details
-- [flask-app/CONVERSION_STATUS.txt](flask-app/CONVERSION_STATUS.txt) - Status
-
-Both versions provide the same password generation functionality!
+See [flask-app/README.md](flask-app/README.md) for run and deployment options.

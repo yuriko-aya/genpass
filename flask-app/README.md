@@ -1,66 +1,78 @@
-# GenPass - Flask/Gunicorn Version
+# GenPass Flask Application
 
-This directory contains the Flask-Gunicorn conversion of the GenPass password generator.
+Server-side password generator powered by Flask and Gunicorn.
 
 ## Quick Start
 
 ```bash
-# From this directory (flask-app/)
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ./run_dev.sh
 ```
 
-Visit: http://localhost:5000
-
-## Documentation
-
-- **[START_HERE.md](START_HERE.md)** - Quick entry point
-- **[QUICKSTART.md](QUICKSTART.md)** - 5-minute setup
-- **[FLASK_SETUP.md](FLASK_SETUP.md)** - Complete guide
-- **[MIGRATION.md](MIGRATION.md)** - Technical details
-- **[CONVERSION_STATUS.txt](CONVERSION_STATUS.txt)** - Full overview
-
-## Project Structure
-
-```
-flask-app/
-├── app.py                      # Flask application
-├── password_generator.py       # Python password logic
-├── gunicorn_config.py         # Gunicorn config
-├── requirements.txt           # Dependencies
-├── templates/                 # HTML templates
-├── static/                    # CSS/JS assets
-├── Dockerfile                 # Docker image
-├── docker-compose.yml         # Docker Compose
-└── Documentation files...
-```
+Visit [http://localhost:5000](http://localhost:5000).
 
 ## Running
 
 **Development:**
+
 ```bash
 ./run_dev.sh
 ```
 
 **Production:**
+
 ```bash
 ./run_prod.sh
 ```
 
 **Docker:**
+
 ```bash
 docker-compose up
 ```
 
-## Features
+**Tests:**
 
-- Flask backend with Gunicorn
-- REST API endpoints
-- Password generation (v1 & v2)
-- Docker containerization
-- Production-ready configuration
-- Comprehensive documentation
+```bash
+pytest
+```
 
-See **START_HERE.md** for complete setup instructions.
+## Routes
+
+| Route | Method | Description |
+|---|---|---|
+| `/` | GET | Main UI (custom password options) |
+| `/v2/` | GET | Version 2 UI |
+| `/api/` | GET | Plain-text v1 password (no hyphens) |
+| `/api_v2/` | GET | Plain-text v2 password |
+| `/api/generate` | POST | JSON custom password + strength |
+| `/api/generate/v2` | POST | JSON v2 password + strength |
+
+## Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `RATE_LIMIT_DEFAULT` | `200 per hour` | Default limit for all routes |
+| `RATE_LIMIT_API` | `30 per minute` | Limit for API endpoints |
+| `RATE_LIMIT_STORAGE_URI` | `memory://` | Flask-Limiter storage backend |
+
+## Privacy
+
+Passwords are generated server-side and sent to the browser over HTTPS. They are not stored, but do travel over the network during generation.
+
+## Project Layout
+
+```
+flask-app/
+├── app.py
+├── password_generator.py
+├── gunicorn_config.py
+├── requirements.txt
+├── tests/
+├── templates/
+├── static/
+├── Dockerfile
+└── docker-compose.yml
+```
