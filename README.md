@@ -1,6 +1,6 @@
 # GenPass - Password Generator
 
-A secure password generator with a Flask backend, interactive UI, and plain-text API endpoints.
+A password generator with a Rust server and client-side generation in the interactive UI.
 
 🔗 **Live site**: [https://genpass.yuriko-aya.cc](https://genpass.yuriko-aya.cc)
 
@@ -15,12 +15,12 @@ Legacy GitHub Pages URLs redirect to the live site:
 
 ## Features
 
-- **Version 1**: Customizable length (8–64 chars), selectable character types, optional hyphens
-- **Version 2**: 16-character passwords with guaranteed uppercase, lowercase, digits, and symbols
-- **Interactive UI** and **API endpoints** (plain text and JSON)
+- **Version 1**: Customizable length (8–64), selectable character types, optional hyphens every 8 characters
+- **Version 2**: 16-character passwords with uppercase, lowercase, digits, and symbols
+- **Interactive UI** generates passwords in the browser
+- **Plaintext API** for scripts: `GET /api/` and `GET /api_v2/`
 - **Password strength analysis** with visual feedback
-- **Cryptographically secure generation** via Python `secrets`
-- **Production-ready**: Gunicorn, Docker, health checks
+- **Cryptographically secure generation**: `crypto.getRandomValues` in the browser, OS randomness on the API
 
 ## Available Interfaces
 
@@ -31,10 +31,15 @@ Legacy GitHub Pages URLs redirect to the live site:
 
 ### API Endpoints
 
-- **API v1** (plain text): [https://genpass.yuriko-aya.cc/api/](https://genpass.yuriko-aya.cc/api/)
-- **API v2** (plain text): [https://genpass.yuriko-aya.cc/api_v2/](https://genpass.yuriko-aya.cc/api_v2/)
-- **JSON custom**: `POST /api/generate`
-- **JSON v2**: `POST /api/generate/v2`
+Both endpoints return `text/plain` and are rate limited (default 30 requests per minute per client).
+
+```bash
+curl https://genpass.yuriko-aya.cc/api/
+curl https://genpass.yuriko-aya.cc/api_v2/
+```
+
+- **API v1**: 32 characters from letters and digits, with at least one uppercase letter, one lowercase letter, and one digit
+- **API v2**: 16 characters with uppercase, lowercase, a digit, and a symbol from `!@#$%^&*`
 
 ## Project Structure
 
@@ -44,13 +49,10 @@ genpass/
 ├── v2/index.html           # GitHub Pages redirect
 ├── api/index.html          # GitHub Pages redirect
 ├── api_v2/index.html       # GitHub Pages redirect
-└── flask-app/              # Flask application (source of truth)
-    ├── app.py
-    ├── password_generator.py
-    ├── templates/
-    ├── static/
-    ├── Dockerfile
-    └── docker-compose.yml
+├── src/                    # Rust server and API generator
+├── static/                 # UI pages, CSS, and browser generator
+├── Dockerfile
+└── docker-compose.yml
 ```
 
 See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for more detail.
@@ -59,46 +61,42 @@ See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for more detail.
 
 ```bash
 git clone https://github.com/yuriko-aya/genpass.git
-cd genpass/flask-app
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-./run_dev.sh
+cd genpass
+cargo run
 ```
 
-Visit [http://localhost:5000](http://localhost:5000).
+Visit [http://localhost:8000](http://localhost:8000). Set `PORT` to listen elsewhere.
 
 ### Production / Docker
 
 ```bash
-cd flask-app
-./run_prod.sh          # Gunicorn on port 8000
-# or
-docker-compose up      # Docker on port 8000
+docker compose up --build
 ```
+
+The container listens on port 8000.
 
 ## Security
 
-- Server-side generation with Python `secrets`
+- Browser passwords are created with `crypto.getRandomValues` and are not sent to the server
+- API passwords are created with OS randomness (`OsRng`)
 - Guaranteed character-class coverage when types are enabled
-- Letter-only passwords are rejected by the API
-- Rate limiting on API endpoints
-- Security headers (CSP, X-Frame-Options, etc.)
+- Letter-only passwords are rejected in the UI
+- Rate limiting on `/api/` and `/api_v2/`
+- Security headers (CSP, `X-Frame-Options`, and others)
 - HTML escaping in the UI
 - Passwords are not stored
 
-### Privacy note
+### Privacy
 
-Passwords are generated on the server and transmitted to your browser over HTTPS. They are never stored, but the plaintext password does travel over the network during generation. If you need passwords that never leave your device, use an offline generator instead.
+The interactive pages create the password in your browser. It stays on the device. `GET /api/` and `GET /api_v2/` create a password on the server and return it as plain text for scripts, so that password travels over the connection.
+
+`RATE_LIMIT_API` controls the API limit. Use a number, or a value such as `30 per minute`.
 
 ## Testing
 
 ```bash
-cd flask-app
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-pytest
+cargo test
+node --test tests/password.test.mjs
 ```
 
 ## Author

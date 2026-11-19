@@ -1,0 +1,15 @@
+services:
+  genpass:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      RATE_LIMIT_API: "30 per minute"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
